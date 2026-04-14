@@ -1,0 +1,2107 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Summer Game Dev Camp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ===== BASE RESET & TOKENS ===== */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    :root {
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+
+      --clr-bg: #0d0d14;
+      --clr-surface: #13131f;
+      --clr-surface-2: #1a1a2a;
+      --clr-border: rgba(255, 255, 255, 0.08);
+      --clr-text: #e8e8f0;
+      --clr-muted: #888899;
+      --clr-faint: #44445a;
+
+      /* Game color palette */
+      --clr-snake: #22c55e;
+      --clr-space: #a78bfa;
+      --clr-pong: #38bdf8;
+      --clr-breakout: #fb923c;
+      --clr-frogger: #4ade80;
+      --clr-flappy: #facc15;
+      --clr-asteroids: #f472b6;
+      --clr-pacman: #fbbf24;
+
+      --clr-accent: #7c6ffc;
+      --clr-accent-glow: rgba(124, 111, 252, 0.35);
+
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+
+      --sp-1: 4px;
+      --sp-2: 8px;
+      --sp-3: 12px;
+      --sp-4: 16px;
+      --sp-5: 20px;
+      --sp-6: 24px;
+      --sp-8: 32px;
+      --sp-10: 40px;
+      --sp-12: 48px;
+      --sp-16: 64px;
+      --sp-20: 80px;
+
+      --transition: 220ms cubic-bezier(0.16, 1, 0.3, 1);
+      --content: 1100px;
+    }
+
+    [data-theme="light"] {
+      --clr-bg: #f4f4f7;
+      --clr-surface: #ffffff;
+      --clr-surface-2: #e9e9f0;
+      --clr-border: rgba(0, 0, 0, 0.1);
+      --clr-text: #1a1a2e;
+      --clr-muted: #55556a;
+      --clr-faint: #999aad;
+      --clr-accent: #6354e8;
+      --clr-accent-glow: rgba(99, 84, 232, 0.25);
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      background: var(--clr-surface-2);
+      border: 1px solid var(--clr-border);
+      border-radius: 99px;
+      padding: 3px;
+      gap: 0;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .theme-toggle-opt {
+      padding: 4px 12px;
+      border-radius: 99px;
+      color: var(--clr-muted);
+      transition: all var(--transition);
+      user-select: none;
+    }
+
+    .theme-toggle-opt.active {
+      background: var(--clr-accent);
+      color: #fff;
+    }
+
+    body {
+      background: var(--clr-bg);
+      color: var(--clr-text);
+      font-family: var(--font-display);
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    /* ===== SCANLINE OVERLAY ===== */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 0, 0, 0.03) 2px,
+          rgba(0, 0, 0, 0.03) 4px);
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    button {
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    [data-theme="light"] .nav {
+      background: rgba(244, 244, 247, 0.88);
+    }
+
+    [data-theme="light"] body::before {
+      background: repeating-linear-gradient(0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 0, 0, 0.015) 2px,
+          rgba(0, 0, 0, 0.015) 4px);
+    }
+
+    [data-theme="light"] .hero-grid-bg {
+      background-image:
+        linear-gradient(rgba(99, 84, 232, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 84, 232, 0.08) 1px, transparent 1px);
+    }
+
+    /* ===== CONTAINERS ===== */
+    .container {
+      max-width: var(--content);
+      margin-inline: auto;
+      padding-inline: var(--sp-6);
+    }
+
+    .section {
+      padding-block: var(--sp-20);
+      scroll-margin-top: 70px;
+    }
+
+    /* ===== NAV ===== */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: var(--sp-4) var(--sp-6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(13, 13, 20, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--clr-border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo svg {
+      flex-shrink: 0;
+    }
+
+    .nav-badge {
+      background: var(--clr-accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 2px 8px;
+      border-radius: 99px;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: var(--sp-6);
+      font-size: 14px;
+      color: var(--clr-muted);
+    }
+
+    .nav-links a:hover {
+      color: var(--clr-text);
+      transition: color var(--transition);
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: var(--sp-20) var(--sp-6);
+      padding-top: calc(var(--sp-20) + 60px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(124, 111, 252, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124, 111, 252, 0.06) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124, 111, 252, 0.18) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -55%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      background: rgba(124, 111, 252, 0.12);
+      border: 1px solid rgba(124, 111, 252, 0.35);
+      color: #a78bfa;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: var(--sp-2) var(--sp-4);
+      border-radius: 99px;
+      margin-bottom: var(--sp-6);
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.05;
+      margin-bottom: var(--sp-6);
+    }
+
+    .hero h1 .accent {
+      background: linear-gradient(135deg, #7c6ffc 0%, #a78bfa 40%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--clr-muted);
+      max-width: 560px;
+      margin-bottom: var(--sp-10);
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: var(--sp-4);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      border: none;
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--clr-accent);
+      color: #fff;
+      box-shadow: 0 0 0 0 var(--clr-accent-glow);
+    }
+
+    .btn-primary:hover {
+      background: #6b5fe8;
+      box-shadow: 0 0 28px var(--clr-accent-glow);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: var(--clr-surface-2);
+      color: var(--clr-text);
+      border: 1px solid var(--clr-border);
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    /* Hero stats */
+    .hero-stats {
+      display: flex;
+      gap: var(--sp-8);
+      margin-top: var(--sp-12);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--clr-text);
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--clr-muted);
+      margin-top: 2px;
+    }
+
+    /* ===== SECTION HEADERS ===== */
+    .section-tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--clr-accent);
+      margin-bottom: var(--sp-3);
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: var(--sp-4);
+    }
+
+    .section-sub {
+      color: var(--clr-muted);
+      font-size: 1.05rem;
+      max-width: 560px;
+    }
+
+    /* ===== HOW IT WORKS ===== */
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--sp-4);
+      margin-top: var(--sp-10);
+    }
+
+    .how-card {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-6);
+      position: relative;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+
+    .how-card:hover {
+      border-color: rgba(124, 111, 252, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .how-step {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--clr-accent);
+      text-transform: uppercase;
+      margin-bottom: var(--sp-4);
+    }
+
+    .how-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: var(--sp-4);
+    }
+
+    .how-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: var(--sp-2);
+    }
+
+    .how-card p {
+      font-size: 14px;
+      color: var(--clr-muted);
+      line-height: 1.6;
+    }
+
+    /* ===== GAME GALLERY ===== */
+    #games {
+      background: var(--clr-surface);
+    }
+
+    .gallery-intro {
+      margin-bottom: var(--sp-8);
+    }
+
+    .vote-status {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      background: var(--clr-surface-2);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-4) var(--sp-5);
+      margin-top: var(--sp-6);
+      font-size: 14px;
+      color: var(--clr-muted);
+    }
+
+    .vote-status .chosen-name {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .vote-pulse {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--clr-snake);
+      flex-shrink: 0;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+      }
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--sp-4);
+      margin-top: var(--sp-6);
+    }
+
+    .game-card {
+      background: var(--clr-bg);
+      border: 2px solid var(--clr-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all var(--transition);
+      position: relative;
+    }
+
+    .game-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .game-card.selected {
+      border-width: 2px;
+    }
+
+    .game-canvas-wrap {
+      width: 100%;
+      aspect-ratio: 16/9;
+      position: relative;
+      overflow: hidden;
+      background: #0a0a12;
+    }
+
+    canvas.game-preview {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .game-selected-badge {
+      position: absolute;
+      top: var(--sp-3);
+      right: var(--sp-3);
+      background: white;
+      border-radius: 99px;
+      width: 24px;
+      height: 24px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      z-index: 5;
+    }
+
+    .game-card.selected .game-selected-badge {
+      display: flex;
+    }
+
+    .game-votes-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .game-votes-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 0;
+      transition: width 0.6s ease;
+    }
+
+    .game-info {
+      padding: var(--sp-4) var(--sp-5);
+    }
+
+    .game-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--sp-2);
+    }
+
+    .game-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .game-diff {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: 99px;
+      text-transform: uppercase;
+    }
+
+    .diff-easy {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+    }
+
+    .diff-medium {
+      background: rgba(251, 146, 60, 0.15);
+      color: #fb923c;
+    }
+
+    .diff-hard {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+    }
+
+    .game-desc {
+      font-size: 13px;
+      color: var(--clr-muted);
+      line-height: 1.5;
+      margin-bottom: var(--sp-3);
+    }
+
+    .game-tags {
+      display: flex;
+      gap: var(--sp-2);
+      flex-wrap: wrap;
+    }
+
+    .game-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--clr-muted);
+    }
+
+    .game-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      margin-top: var(--sp-4);
+    }
+
+    .game-play-link {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--clr-border);
+      background: rgba(255, 255, 255, 0.03);
+      transition: all var(--transition);
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .game-play-link:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .game-vote-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--clr-border);
+      color: var(--clr-muted);
+      transition: all var(--transition);
+      font-family: inherit;
+    }
+
+    .game-card.selected .game-vote-btn {
+      color: white;
+      border-color: transparent;
+    }
+
+    .game-vote-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--clr-text);
+    }
+
+    /* ===== CURRICULUM ===== */
+    .curriculum {
+      position: relative;
+    }
+
+    .week-tabs {
+      display: flex;
+      gap: var(--sp-2);
+      margin-top: var(--sp-10);
+      overflow-x: auto;
+      padding-bottom: var(--sp-2);
+      scrollbar-width: none;
+    }
+
+    .week-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .week-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: var(--sp-3) var(--sp-5);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--clr-border);
+      cursor: pointer;
+      background: var(--clr-surface);
+      transition: all var(--transition);
+      flex-shrink: 0;
+      font-family: inherit;
+      min-width: 140px;
+    }
+
+    .week-tab:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .week-tab.active {
+      border-color: var(--clr-accent);
+      background: rgba(124, 111, 252, 0.1);
+    }
+
+    .tab-week-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--clr-accent);
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+
+    .tab-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--clr-text);
+      margin-top: 2px;
+    }
+
+    .tab-days {
+      font-size: 12px;
+      color: var(--clr-muted);
+    }
+
+    .week-panel {
+      display: none;
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-xl);
+      padding: var(--sp-8);
+      margin-top: var(--sp-4);
+      animation: fadeUp 0.3s ease;
+    }
+
+    .week-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .panel-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--sp-4);
+      align-items: start;
+      margin-bottom: var(--sp-6);
+      padding-bottom: var(--sp-6);
+      border-bottom: 1px solid var(--clr-border);
+    }
+
+    .panel-week-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--clr-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--sp-2);
+    }
+
+    .panel-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-subtitle {
+      font-size: 14px;
+      color: var(--clr-muted);
+      margin-top: var(--sp-2);
+    }
+
+    .panel-emoji {
+      font-size: 3rem;
+    }
+
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: var(--sp-4);
+    }
+
+    .day-card {
+      background: var(--clr-bg);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      padding: var(--sp-4);
+    }
+
+    .day-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--clr-muted);
+      text-transform: uppercase;
+      margin-bottom: var(--sp-2);
+    }
+
+    .day-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--clr-text);
+      margin-bottom: var(--sp-2);
+    }
+
+    .day-activities {
+      list-style: none;
+      padding: 0;
+    }
+
+    .day-activities li {
+      font-size: 13px;
+      color: var(--clr-muted);
+      padding: 3px 0;
+      padding-left: var(--sp-4);
+      position: relative;
+      line-height: 1.4;
+    }
+
+    .day-activities li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: var(--clr-accent);
+      font-weight: 700;
+    }
+
+    .week-outcomes {
+      margin-top: var(--sp-6);
+      padding: var(--sp-5) var(--sp-6);
+      background: rgba(124, 111, 252, 0.06);
+      border: 1px solid rgba(124, 111, 252, 0.2);
+      border-radius: var(--radius-lg);
+    }
+
+    .outcomes-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--clr-accent);
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+      margin-bottom: var(--sp-3);
+    }
+
+    .outcomes-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-2);
+    }
+
+    .outcome-chip {
+      background: rgba(124, 111, 252, 0.12);
+      border: 1px solid rgba(124, 111, 252, 0.25);
+      color: #a78bfa;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 99px;
+    }
+
+    /* ===== TOOLS SECTION ===== */
+    .tools-section {
+      background: var(--clr-surface);
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--sp-4);
+      margin-top: var(--sp-10);
+    }
+
+    .tool-card {
+      background: var(--clr-bg);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-5);
+      transition: border-color var(--transition), transform var(--transition);
+    }
+
+    .tool-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .tool-icon {
+      font-size: 2rem;
+      margin-bottom: var(--sp-3);
+    }
+
+    .tool-name {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .tool-role {
+      font-size: 13px;
+      color: var(--clr-muted);
+    }
+
+    /* ===== CONCEPTS ===== */
+    .concepts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: var(--sp-3);
+      margin-top: var(--sp-10);
+    }
+
+    .concept-pill {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      padding: var(--sp-4) var(--sp-5);
+      transition: all var(--transition);
+    }
+
+    .concept-pill:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: var(--clr-surface-2);
+    }
+
+    .concept-pill .icon {
+      font-size: 1.4rem;
+      margin-bottom: var(--sp-2);
+    }
+
+    .concept-pill .name {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .concept-pill .detail {
+      font-size: 12px;
+      color: var(--clr-muted);
+    }
+
+    /* ===== FINAL SHOW ===== */
+    .final-show {
+      background: linear-gradient(135deg, rgba(124, 111, 252, 0.1) 0%, rgba(56, 189, 248, 0.06) 100%);
+      border-top: 1px solid rgba(124, 111, 252, 0.2);
+      border-bottom: 1px solid rgba(124, 111, 252, 0.2);
+      text-align: center;
+      padding: var(--sp-20) var(--sp-6);
+    }
+
+    .final-show .section-title {
+      max-width: 600px;
+      margin-inline: auto;
+    }
+
+    .final-show .section-sub {
+      margin-inline: auto;
+      max-width: 480px;
+    }
+
+    .deliverables {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-4);
+      justify-content: center;
+      margin-top: var(--sp-10);
+    }
+
+    .deliverable {
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-4) var(--sp-6);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .deliverable-icon {
+      font-size: 1.5rem;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      text-align: center;
+      padding: var(--sp-10) var(--sp-6);
+      border-top: 1px solid var(--clr-border);
+      color: var(--clr-faint);
+      font-size: 13px;
+    }
+
+    footer span {
+      color: var(--clr-muted);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .games-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-header {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-emoji {
+        font-size: 2rem;
+      }
+
+      .hero-stats {
+        gap: var(--sp-6);
+      }
+
+      .days-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"
+        aria-label="Game Dev Camp logo">
+        <rect x="3" y="3" width="22" height="22" rx="5" fill="#7c6ffc" opacity="0.15" stroke="#7c6ffc"
+          stroke-width="1.5" />
+        <rect x="8" y="11" width="4" height="6" rx="1" fill="#7c6ffc" />
+        <rect x="16" y="11" width="4" height="6" rx="1" fill="#7c6ffc" />
+        <rect x="10" y="13" width="2" height="2" rx="0.5" fill="white" />
+        <rect x="18" y="13" width="2" height="2" rx="0.5" fill="white" />
+      </svg>
+      <span>Game Dev Camp</span>
+    </div>
+    <nav class="nav-links" aria-label="Page sections">
+      <a href="#how">How It Works</a>
+      <a href="#games">Choose a Game</a>
+      <a href="#curriculum">Curriculum</a>
+      <a href="#tools">Tools</a>
+    </nav>
+    <span class="nav-badge">Summer 2026</span>
+    <div class="theme-toggle" onclick="toggleTheme()" role="button" aria-label="Toggle light and dark theme">
+      <span class="theme-toggle-opt" id="toggleLight">Light</span>
+      <span class="theme-toggle-opt active" id="toggleDark">Dark</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-grid-bg" aria-hidden="true"></div>
+    <div class="hero-glow" aria-hidden="true"></div>
+
+    <div class="hero-tag" aria-label="Program badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polygon
+          points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      </svg>
+      4-Week Summer Program
+    </div>
+
+    <h1 id="hero-heading">
+      Build Your<br>
+      <span class="accent">Favorite 2-D Game</span><br>
+      From Scratch
+    </h1>
+
+    <p class="hero-sub">
+      Students explore classic games, vote on their favorite, and spend four weeks coding it to life — using real
+      JavaScript, real tools, and real teamwork.
+    </p>
+
+    <div class="hero-ctas">
+      <a href="#games" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+        Explore Games
+      </a>
+      <a href="#curriculum" class="btn btn-ghost">View Curriculum</a>
+    </div>
+
+    <div class="hero-stats" role="list" aria-label="Program stats">
+      <div class="stat-item" role="listitem">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Weeks of Building</div>
+      </div>
+      <div class="stat-item" role="listitem">
+        <div class="stat-num">8</div>
+        <div class="stat-label">Game Choices</div>
+      </div>
+      <div class="stat-item" role="listitem">
+        <div class="stat-num">1</div>
+        <div class="stat-label">Final Playable Game</div>
+      </div>
+      <div class="stat-item" role="listitem">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Fun Guaranteed</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how" aria-labelledby="how-heading">
+    <div class="container">
+      <div class="section-tag">Program Flow</div>
+      <h2 class="section-title" id="how-heading">How It Works</h2>
+      <p class="section-sub">Students aren't just learning code — they're making creative decisions every step of the
+        way.</p>
+
+      <div class="how-grid" role="list">
+        <div class="how-card" role="listitem">
+          <div class="how-step">Step 01</div>
+          <div class="how-icon" aria-hidden="true" style="background:rgba(124,111,252,0.12);">🎮</div>
+          <h3>Explore Classic Games</h3>
+          <p>Day 1 begins with a guided tour of iconic 2D games. Students play and analyze what makes each one fun and
+            how it might be built.</p>
+        </div>
+        <div class="how-card" role="listitem">
+          <div class="how-step">Step 02</div>
+          <div class="how-icon" aria-hidden="true" style="background:rgba(250,204,21,0.1);">🗳️</div>
+          <h3>Class Vote</h3>
+          <p>Students vote on which game the class will build together. The winning game sets the direction for all four
+            weeks.</p>
+        </div>
+        <div class="how-card" role="listitem">
+          <div class="how-step">Step 03</div>
+          <div class="how-icon" aria-hidden="true" style="background:rgba(34,197,94,0.1);">💻</div>
+          <h3>Code Week by Week</h3>
+          <p>Starting from a blank file, the game grows each week — a working prototype, then features, then polish —
+            using JavaScript and p5.js.</p>
+        </div>
+        <div class="how-card" role="listitem">
+          <div class="how-step">Step 04</div>
+          <div class="how-icon" aria-hidden="true" style="background:rgba(251,146,60,0.1);">🏆</div>
+          <h3>Final Game Showcase</h3>
+          <p>Week 4 ends with a live demo event. Students present their game to peers, add personal touches, and
+            celebrate what they built.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME GALLERY -->
+  <section class="section" id="games" aria-labelledby="games-heading">
+    <div class="container">
+      <div class="gallery-intro">
+        <div class="section-tag">Choose Your Game</div>
+        <h2 class="section-title" id="games-heading">8 Games Students Can Vote For</h2>
+        <p class="section-sub">Each game is designed to be completable in 4 weeks while teaching core programming
+          skills. Click to select a favorite!</p>
+
+        <div class="vote-status" id="voteStatus" role="status" aria-live="polite">
+          <div class="vote-pulse" id="votePulse"></div>
+          <div>No game selected yet — click a card to cast a vote!</div>
+        </div>
+      </div>
+
+      <div class="games-grid" id="gamesGrid" role="list">
+        <!-- Dynamically inserted by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- CURRICULUM -->
+  <section class="section curriculum" id="curriculum" aria-labelledby="curriculum-heading">
+    <div class="container">
+      <div class="section-tag">4-Week Plan</div>
+      <h2 class="section-title" id="curriculum-heading">Week-by-Week Curriculum</h2>
+      <p class="section-sub">Each week builds on the last, moving from concept to code to a fully playable, polished
+        game.</p>
+
+      <div class="week-tabs" role="tablist" aria-label="Curriculum weeks">
+        <button class="week-tab active" onclick="showWeek(0)" role="tab" aria-selected="true"
+          aria-controls="week-panel-0">
+          <span class="tab-week-num">Week 1</span>
+          <span class="tab-title">Explore & Set Up</span>
+          <span class="tab-days">5 days</span>
+        </button>
+        <button class="week-tab" onclick="showWeek(1)" role="tab" aria-selected="false" aria-controls="week-panel-1">
+          <span class="tab-week-num">Week 2</span>
+          <span class="tab-title">Core Mechanics</span>
+          <span class="tab-days">5 days</span>
+        </button>
+        <button class="week-tab" onclick="showWeek(2)" role="tab" aria-selected="false" aria-controls="week-panel-2">
+          <span class="tab-week-num">Week 3</span>
+          <span class="tab-title">Features & Logic</span>
+          <span class="tab-days">5 days</span>
+        </button>
+        <button class="week-tab" onclick="showWeek(3)" role="tab" aria-selected="false" aria-controls="week-panel-3">
+          <span class="tab-week-num">Week 4</span>
+          <span class="tab-title">Polish & Launch</span>
+          <span class="tab-days">5 days</span>
+        </button>
+      </div>
+
+      <div id="week-panel-0" class="week-panel active" role="tabpanel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-week-label">Week 1 · Days 1–5</div>
+            <div class="panel-title">Explore, Vote & Set Up</div>
+            <div class="panel-subtitle">Students play classic games, choose their favorite, and get their dev
+              environment ready.</div>
+          </div>
+          <div class="panel-emoji" aria-hidden="true">🎮</div>
+        </div>
+        <div class="days-grid">
+          <div class="day-card">
+            <div class="day-label">Monday · Day 1</div>
+            <div class="day-title">Game Exploration</div>
+            <ul class="day-activities">
+              <li>Play 8 demo games live in browser</li>
+              <li>Discuss what makes each game fun</li>
+              <li>Identify patterns: loops, collision, score</li>
+              <li>Class vote — announce the winning game!</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Tuesday · Day 2</div>
+            <div class="day-title">Dev Environment Setup</div>
+            <ul class="day-activities">
+              <li>Create a p5.js Web Editor account</li>
+              <li>JavaScript basics refresher</li>
+              <li>Tour the editor: code, preview, console</li>
+              <li>"Hello, canvas!" — first shapes on screen</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Wednesday · Day 3</div>
+            <div class="day-title">The Game Loop</div>
+            <ul class="day-activities">
+              <li>What is a game loop? (setup → draw)</li>
+              <li>Frames per second & timing</li>
+              <li>Draw a shape, move it with arrow keys</li>
+              <li>Mini-challenge: change color on key press</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Thursday · Day 4</div>
+            <div class="day-title">Deconstruct Our Game</div>
+            <ul class="day-activities">
+              <li>Sketch the game on the whiteboard</li>
+              <li>List every object: player, walls, enemies</li>
+              <li>Identify each system needed</li>
+              <li>Create a project file structure</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Friday · Day 5</div>
+            <div class="day-title">Player Object</div>
+            <ul class="day-activities">
+              <li>Define the player as a JavaScript object</li>
+              <li>Add position, speed properties</li>
+              <li>Keyboard input → movement</li>
+              <li>Keep player inside the canvas (bounds)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="week-outcomes">
+          <div class="outcomes-label">Week 1 Outcomes</div>
+          <div class="outcomes-list">
+            <span class="outcome-chip">Game Loop</span>
+            <span class="outcome-chip">JavaScript Objects</span>
+            <span class="outcome-chip">Keyboard Input</span>
+            <span class="outcome-chip">p5.js Setup</span>
+            <span class="outcome-chip">Web Editor</span>
+            <span class="outcome-chip">Project Decomposition</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="week-panel-1" class="week-panel" role="tabpanel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-week-label">Week 2 · Days 6–10</div>
+            <div class="panel-title">Core Mechanics</div>
+            <div class="panel-subtitle">Build the game's engine: movement, collision detection, and a working prototype.
+            </div>
+          </div>
+          <div class="panel-emoji" aria-hidden="true">⚙️</div>
+        </div>
+        <div class="days-grid">
+          <div class="day-card">
+            <div class="day-label">Monday · Day 6</div>
+            <div class="day-title">Sprites & Images</div>
+            <ul class="day-activities">
+              <li>Load images with loadImage() and preload()</li>
+              <li>Draw sprites with image()</li>
+              <li>Replace placeholder shapes with art</li>
+              <li>Discuss copyright-free game assets</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Tuesday · Day 7</div>
+            <div class="day-title">Other Game Objects</div>
+            <ul class="day-activities">
+              <li>Create enemy / ball / block objects</li>
+              <li>Spawn multiple objects with an array</li>
+              <li>Animate using frameCount & timers</li>
+              <li>Debug with console.log()</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Wednesday · Day 8</div>
+            <div class="day-title">Collision Detection</div>
+            <ul class="day-activities">
+              <li>Bounding-box vs. circle collision</li>
+              <li>Using dist() and overlap checks in p5.js</li>
+              <li>What happens on hit? (die, bounce, score)</li>
+              <li>Test + fix edge cases</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Thursday · Day 9</div>
+            <div class="day-title">Scoring & State</div>
+            <ul class="day-activities">
+              <li>Display score with font rendering</li>
+              <li>Game states: PLAYING / GAME OVER</li>
+              <li>Conditionals to switch states</li>
+              <li>"Play Again" key press logic</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Friday · Day 10</div>
+            <div class="day-title">Prototype Demo Day</div>
+            <ul class="day-activities">
+              <li>Finish playable prototype (any state)</li>
+              <li>Share screen — classmates play it!</li>
+              <li>Give + receive feedback cards</li>
+              <li>Plan Week 3 feature additions</li>
+            </ul>
+          </div>
+        </div>
+        <div class="week-outcomes">
+          <div class="outcomes-label">Week 2 Outcomes</div>
+          <div class="outcomes-list">
+            <span class="outcome-chip">Collision Detection</span>
+            <span class="outcome-chip">Sprites & Assets</span>
+            <span class="outcome-chip">Arrays & Loops</span>
+            <span class="outcome-chip">Game States</span>
+            <span class="outcome-chip">Score Display</span>
+            <span class="outcome-chip">Working Prototype</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="week-panel-2" class="week-panel" role="tabpanel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-week-label">Week 3 · Days 11–15</div>
+            <div class="panel-title">Features & Game Logic</div>
+            <div class="panel-subtitle">Add what makes the game exciting — levels, audio, difficulty scaling, and extra
+              mechanics.</div>
+          </div>
+          <div class="panel-emoji" aria-hidden="true">🚀</div>
+        </div>
+        <div class="days-grid">
+          <div class="day-card">
+            <div class="day-label">Monday · Day 11</div>
+            <div class="day-title">Sound & Music</div>
+            <ul class="day-activities">
+              <li>p5.sound library & loadSound()</li>
+              <li>Load .mp3 / .wav audio files</li>
+              <li>Trigger sounds on events (hit, score, die)</li>
+              <li>Background music loop</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Tuesday · Day 12</div>
+            <div class="day-title">Difficulty Scaling</div>
+            <ul class="day-activities">
+              <li>Increase speed over time</li>
+              <li>Spawn more enemies by score tier</li>
+              <li>Variables vs. hardcoded values</li>
+              <li>Balancing: playtesting rounds</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Wednesday · Day 13</div>
+            <div class="day-title">Levels or Waves</div>
+            <ul class="day-activities">
+              <li>Design 3 level/wave patterns</li>
+              <li>Level transition screen</li>
+              <li>Array/object-driven level data</li>
+              <li>Win condition when all levels done</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Thursday · Day 14</div>
+            <div class="day-title">Player Choice Day</div>
+            <ul class="day-activities">
+              <li>Students add one personal feature</li>
+              <li>Power-ups, skins, extra lives, etc.</li>
+              <li>Pair-programming encouraged</li>
+              <li>Code review with teacher</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Friday · Day 15</div>
+            <div class="day-title">Beta Test Day</div>
+            <ul class="day-activities">
+              <li>Swap games with a classmate</li>
+              <li>Find and report 3 bugs each</li>
+              <li>Fix highest-priority bugs</li>
+              <li>Git commit: "beta build"</li>
+            </ul>
+          </div>
+        </div>
+        <div class="week-outcomes">
+          <div class="outcomes-label">Week 3 Outcomes</div>
+          <div class="outcomes-list">
+            <span class="outcome-chip">Sound Effects</span>
+            <span class="outcome-chip">Difficulty Design</span>
+            <span class="outcome-chip">Level Systems</span>
+            <span class="outcome-chip">Objects</span>
+            <span class="outcome-chip">Bug Testing</span>
+            <span class="outcome-chip">Git Commits</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="week-panel-3" class="week-panel" role="tabpanel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-week-label">Week 4 · Days 16–20</div>
+            <div class="panel-title">Polish & Launch</div>
+            <div class="panel-subtitle">The final sprint — screens, effects, README, and a live showcase for friends and
+              family.</div>
+          </div>
+          <div class="panel-emoji" aria-hidden="true">🏆</div>
+        </div>
+        <div class="days-grid">
+          <div class="day-card">
+            <div class="day-label">Monday · Day 16</div>
+            <div class="day-title">Title & Menu Screens</div>
+            <ul class="day-activities">
+              <li>Design a title screen layout</li>
+              <li>Animated title text with text() and sin()</li>
+              <li>Menu: Start, How to Play, Quit</li>
+              <li>Consistent visual theme/color palette</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Tuesday · Day 17</div>
+            <div class="day-title">Visual Polish</div>
+            <ul class="day-activities">
+              <li>Particle effects (explosions, sparks)</li>
+              <li>Screen shake on impact</li>
+              <li>Animated sprites (walk cycle)</li>
+              <li>Background parallax layer</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Wednesday · Day 18</div>
+            <div class="day-title">High Scores & Save</div>
+            <ul class="day-activities">
+              <li>Save scores with localStorage</li>
+              <li>Read + display top 5 scores</li>
+              <li>Name entry screen (initials)</li>
+              <li>Discuss browser storage basics</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Thursday · Day 19</div>
+            <div class="day-title">Share & Publish</div>
+            <ul class="day-activities">
+              <li>Generate a shareable p5.js sketch link</li>
+              <li>Push code to a public GitHub repo</li>
+              <li>Write a project README.md</li>
+              <li>Peer-play all finished games</li>
+            </ul>
+          </div>
+          <div class="day-card">
+            <div class="day-label">Friday · Day 20</div>
+            <div class="day-title">🎉 Showcase Day!</div>
+            <ul class="day-activities">
+              <li>Live demo to audience</li>
+              <li>Each student explains one piece of code</li>
+              <li>Best Feature + Most Fun awards</li>
+              <li>Reflection: what would you add?</li>
+            </ul>
+          </div>
+        </div>
+        <div class="week-outcomes">
+          <div class="outcomes-label">Week 4 Outcomes</div>
+          <div class="outcomes-list">
+            <span class="outcome-chip">Screen Design</span>
+            <span class="outcome-chip">Particle Effects</span>
+            <span class="outcome-chip">Browser Storage</span>
+            <span class="outcome-chip">README Writing</span>
+            <span class="outcome-chip">Public GitHub Repo</span>
+            <span class="outcome-chip">Live Demo Skills</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOOLS -->
+  <section class="section tools-section" id="tools" aria-labelledby="tools-heading">
+    <div class="container">
+      <div class="section-tag">Tech Stack</div>
+      <h2 class="section-title" id="tools-heading">Tools Students Use</h2>
+      <p class="section-sub">The same tools used by real web developers — inside a beginner-friendly, browser-based workflow.
+      </p>
+
+      <div class="tools-grid" role="list">
+        <div class="tool-card" role="listitem">
+          <div class="tool-icon" aria-hidden="true">✨</div>
+          <div class="tool-name">JavaScript</div>
+          <div class="tool-role">Primary coding language — the language of the web, runs in every browser</div>
+        </div>
+        <div class="tool-card" role="listitem">
+          <div class="tool-icon" aria-hidden="true">🎮</div>
+          <div class="tool-name">p5.js</div>
+          <div class="tool-role">Creative coding library — drawing, animation, sound, and input made simple</div>
+        </div>
+        <div class="tool-card" role="listitem">
+          <div class="tool-icon" aria-hidden="true">🖥️</div>
+          <div class="tool-name">p5.js Web Editor</div>
+          <div class="tool-role">Browser-based coding environment — write code, hit play, share with one link</div>
+        </div>
+        <div class="tool-card" role="listitem">
+          <div class="tool-icon" aria-hidden="true">🌐</div>
+          <div class="tool-name">Web Browser</div>
+          <div class="tool-role">The game runs right in the browser — no installs, no downloads, instant results</div>
+        </div>
+        <div class="tool-card" role="listitem">
+          <div class="tool-icon" aria-hidden="true">🐙</div>
+          <div class="tool-name">GitHub</div>
+          <div class="tool-role">Version control + project hosting — students save work and share their code</div>
+        </div>
+        <div class="tool-card" role="listitem">
+          <div class="tool-icon" aria-hidden="true">🎨</div>
+          <div class="tool-name">Piskel / LibreSprite</div>
+          <div class="tool-role">Pixel art editor — students create or edit their own sprites and tilesets</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONCEPTS -->
+  <section class="section" id="concepts" aria-labelledby="concepts-heading">
+    <div class="container">
+      <div class="section-tag">Learning Outcomes</div>
+      <h2 class="section-title" id="concepts-heading">What Students Learn</h2>
+      <p class="section-sub">Real CS and game design concepts wrapped inside a project kids actually care about
+        finishing.</p>
+
+      <div class="concepts-grid" role="list">
+        <div class="concept-pill" role="listitem">
+          <div class="icon" aria-hidden="true">🔄</div>
+          <div class="name">The Game Loop</div>
+          <div class="detail">setup → draw cycle, FPS</div>
+        </div>
+        <div class="concept-pill" role="listitem">
+          <div class="icon" aria-hidden="true">📦</div>
+          <div class="name">Objects & Functions</div>
+          <div class="detail">properties, methods, reusable code</div>
+        </div>
+        <div class="concept-pill" role="listitem">
+          <div class="icon" aria-hidden="true">📋</div>
+          <div class="name">Arrays & Objects</div>
+          <div class="detail">storing game objects & level data</div>
+        </div>
+        <div class="concept-pill" role="listitem">
+          <div class="icon" aria-hidden="true">💥</div>
+          <div class="name">Collision Detection</div>
+          <div class="detail">bounding boxes, rect overlap</div>
+        </div>
+        <div class="concept-pill" role="listitem">
+          <div class="icon" aria-hidden="true">⌨️</div>
+          <div class="name">Event Handling</div>
+          <div class="detail">keyboard, mouse, timers</div>
+        </div>
+        <div class="concept-pill" role="listitem">
+          <div class="icon" aria-hidden="true">🔀</div>
+          <div class="name">State Machines</div>
+          <div class="detail">playing, paused, game-over</div>
+        </div>
+        <div class="concept-pill" role="listitem">
+          <div class="icon" aria-hidden="true">🔊</div>
+          <div class="name">Audio Integration</div>
+          <div class="detail">sound effects, music loops</div>
+        </div>
+        <div class="concept-pill" role="listitem">
+          <div class="icon" aria-hidden="true">📁</div>
+          <div class="name">Browser Storage</div>
+          <div class="detail">saving & loading high scores</div>
+        </div>
+        <div class="concept-pill" role="listitem">
+          <div class="icon" aria-hidden="true">🐛</div>
+          <div class="name">Debugging</div>
+          <div class="detail">console.log, breakpoints, dev tools</div>
+        </div>
+        <div class="concept-pill" role="listitem">
+          <div class="icon" aria-hidden="true">🌿</div>
+          <div class="name">Git & Commits</div>
+          <div class="detail">version history, branching</div>
+        </div>
+        <div class="concept-pill" role="listitem">
+          <div class="icon" aria-hidden="true">📊</div>
+          <div class="name">Difficulty Scaling</div>
+          <div class="detail">variables that change over time</div>
+        </div>
+        <div class="concept-pill" role="listitem">
+          <div class="icon" aria-hidden="true">🎨</div>
+          <div class="name">Sprite Art</div>
+          <div class="detail">pixel art, animation frames</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL SHOW -->
+  <section class="final-show" id="showcase" aria-labelledby="showcase-heading">
+    <div class="container">
+      <div class="section-tag">Week 4 Finale</div>
+      <h2 class="section-title" id="showcase-heading">Every Student Ships a Real Game</h2>
+      <p class="section-sub">By the end of four weeks, every student has a shareable game link — and code they actually
+        wrote.</p>
+
+      <div class="deliverables" role="list">
+        <div class="deliverable" role="listitem">
+          <div class="deliverable-icon" aria-hidden="true">🎮</div><span>A fully playable browser game</span>
+        </div>
+        <div class="deliverable" role="listitem">
+          <div class="deliverable-icon" aria-hidden="true">🔗</div><span>Shareable link anyone can play</span>
+        </div>
+        <div class="deliverable" role="listitem">
+          <div class="deliverable-icon" aria-hidden="true">🐙</div><span>Public GitHub repository</span>
+        </div>
+        <div class="deliverable" role="listitem">
+          <div class="deliverable-icon" aria-hidden="true">🎤</div><span>Live demo & code walkthrough</span>
+        </div>
+        <div class="deliverable" role="listitem">
+          <div class="deliverable-icon" aria-hidden="true">🏅</div><span>Certificate of completion</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>Summer Game Dev Camp</span> · Designed for Mr. Paul Jones · Taichung, Taiwan
+  </footer>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // ---- THEME TOGGLE ----
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isLight = html.getAttribute('data-theme') === 'light';
+      html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+      document.getElementById('toggleLight').classList.toggle('active', !isLight);
+      document.getElementById('toggleDark').classList.toggle('active', isLight);
+    }
+
+    // ---- GAME DATA ----
+    const GAMES = [
+      {
+        id: 'snake',
+        name: 'Snake',
+        difficulty: 'easy',
+        color: '#22c55e',
+        playUrl: 'https://playsnake.org',
+        desc: 'Control a growing snake, collect apples, avoid hitting walls or yourself. A perfect starter — pure logic, no physics.',
+        tags: ['Grid Movement', 'Lists', 'Self-Collision'],
+        draw(ctx, w, h, t) {
+          ctx.fillStyle = '#0a0f0c';
+          ctx.fillRect(0, 0, w, h);
+          const sz = 14, cols = Math.floor(w / sz), rows = Math.floor(h / sz);
+          // grid dots
+          ctx.fillStyle = 'rgba(34,197,94,0.08)';
+          for (let x = 0; x < cols; x++) for (let y = 0; y < rows; y++) { ctx.fillRect(x * sz + sz / 2 - 1, y * sz + sz / 2 - 1, 2, 2); }
+          // snake body
+          const len = 7;
+          const headX = Math.floor(cols / 2) + Math.floor(Math.sin(t * 0.8) * 3);
+          const headY = Math.floor(rows / 2);
+          ctx.fillStyle = '#22c55e';
+          for (let i = 0; i < len; i++) {
+            const bx = ((headX - i + cols) % cols) * sz + 1;
+            const by = headY * sz + 1;
+            const a = 1 - i / len * 0.6;
+            ctx.globalAlpha = a;
+            ctx.fillRect(bx, by, sz - 2, sz - 2);
+          }
+          ctx.globalAlpha = 1;
+          // apple
+          const ax = ((headX + 5) % cols) * sz + sz / 2, ay = headY * sz + sz / 2;
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath(); ctx.arc(ax, ay, sz / 2 - 1, 0, Math.PI * 2); ctx.fill();
+        }
+      },
+      {
+        id: 'space',
+        name: 'Space Invaders',
+        difficulty: 'medium',
+        color: '#a78bfa',
+        playUrl: 'https://freeinvaders.org',
+        desc: 'Defend Earth from waves of alien invaders. Shoot them before they reach the bottom. A classic for a reason.',
+        tags: ['Shooting', '2D Arrays', 'Waves'],
+        draw(ctx, w, h, t) {
+          ctx.fillStyle = '#09090f';
+          ctx.fillRect(0, 0, w, h);
+          // stars
+          ctx.fillStyle = 'white';
+          for (let i = 0; i < 40; i++) {
+            const sx = ((i * 137 + t * 10) % w), sy = (i * 73) % h;
+            ctx.globalAlpha = 0.4 + 0.4 * Math.sin(t + i);
+            ctx.fillRect(sx, sy, 1, 1);
+          }
+          ctx.globalAlpha = 1;
+          // invaders
+          const cols = 5, rows = 3, iw = 18, ih = 14, gap = 8;
+          const ox = (w - (cols * (iw + gap))) / 2 + Math.sin(t * 0.5) * 20;
+          const oy = 20 + Math.sin(t * 0.3) * 5;
+          const colors = ['#a78bfa', '#818cf8', '#c4b5fd'];
+          for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+            ctx.fillStyle = colors[r];
+            const ix = ox + c * (iw + gap), iy = oy + r * (ih + gap + 4);
+            ctx.fillRect(ix, iy, iw, ih);
+            ctx.clearRect(ix + 3, iy + 3, 4, 4); ctx.clearRect(ix + iw - 7, iy + 3, 4, 4);
+            ctx.clearRect(ix + 2, iy + ih - 4, iw - 4, 3);
+          }
+          // player
+          const px = w / 2 - 12;
+          ctx.fillStyle = '#38bdf8';
+          ctx.fillRect(px, h - 25, 24, 10);
+          ctx.fillRect(px + 9, h - 33, 6, 10);
+          // bullet
+          const by = h - 35 - ((t * 120) % h);
+          ctx.fillStyle = '#facc15';
+          ctx.fillRect(w / 2 - 1.5, by, 3, 10);
+        }
+      },
+      {
+        id: 'pong',
+        name: 'Pong',
+        difficulty: 'easy',
+        color: '#38bdf8',
+        playUrl: 'https://www.ponggame.org',
+        desc: 'The original video game! Two paddles, one ball, simple physics. Great for learning velocity, bouncing, and score.',
+        tags: ['Physics', 'Velocity', 'Multiplayer'],
+        draw(ctx, w, h, t) {
+          ctx.fillStyle = '#080c10';
+          ctx.fillRect(0, 0, w, h);
+          // center dashes
+          ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 2; ctx.setLineDash([6, 6]);
+          ctx.beginPath(); ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h); ctx.stroke(); ctx.setLineDash([]);
+          // paddles
+          ctx.fillStyle = '#e0f2fe';
+          const oy = Math.sin(t * 1.2) * 30;
+          ctx.fillRect(12, h / 2 - 30 + oy, 10, 50);
+          const oy2 = Math.sin(t * 1.2 + Math.PI) * 30;
+          ctx.fillRect(w - 22, h / 2 - 30 + oy2, 10, 50);
+          // ball
+          const bx = w / 2 + Math.cos(t * 2.5) * w * 0.3;
+          const by = h / 2 + Math.sin(t * 1.8) * h * 0.3;
+          ctx.fillStyle = 'white';
+          ctx.beginPath(); ctx.arc(bx, by, 6, 0, Math.PI * 2); ctx.fill();
+          // score
+          ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = 'bold 20px monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText('3', w / 2 - 30, 28); ctx.fillText('2', w / 2 + 30, 28);
+        }
+      },
+      {
+        id: 'breakout',
+        name: 'Breakout',
+        difficulty: 'medium',
+        color: '#fb923c',
+        playUrl: 'https://elgoog.im/breakout',
+        desc: 'Bounce a ball to smash rows of bricks with your paddle. Teaches angle reflection, grid layouts, and power-ups.',
+        tags: ['Ball Physics', 'Grids', 'Power-ups'],
+        draw(ctx, w, h, t) {
+          ctx.fillStyle = '#100a04';
+          ctx.fillRect(0, 0, w, h);
+          const brickColors = ['#ef4444', '#fb923c', '#facc15', '#4ade80', '#60a5fa'];
+          const bw = 32, bh = 12, gap = 4, cols = 8, rows = 5;
+          const ox = (w - (cols * (bw + gap))) / 2;
+          for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+            if (Math.random() < 0.15 && t > 0) continue;
+            ctx.fillStyle = brickColors[r];
+            ctx.fillRect(ox + c * (bw + gap), 15 + r * (bh + gap), bw, bh);
+          }
+          // paddle
+          const px = w / 2 - 30 + Math.sin(t * 1.5) * 50;
+          ctx.fillStyle = '#fb923c'; ctx.fillRect(px, h - 20, 60, 10);
+          // ball
+          const bx = w / 2 + Math.cos(t * 2.2) * w * 0.32;
+          const by = h * 0.4 + Math.sin(t * 3) * h * 0.25;
+          ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(bx, by, 6, 0, Math.PI * 2); ctx.fill();
+        }
+      },
+      {
+        id: 'frogger',
+        name: 'Frogger',
+        difficulty: 'medium',
+        color: '#4ade80',
+        playUrl: 'https://froggerclassic.appspot.com',
+        desc: 'Guide a frog across a busy road and river. Great for teaching grid-based movement, obstacles, and timing.',
+        tags: ['Grid Steps', 'Obstacles', 'Timing'],
+        draw(ctx, w, h, t) {
+          ctx.fillStyle = '#071208';
+          ctx.fillRect(0, 0, w, h);
+          const laneH = h / 5;
+          const laneColors = ['#1a2e0a', '#1a1a1a', '#1a1a1a', '#0d2236', '#0d2236'];
+          for (let i = 0; i < 5; i++) { ctx.fillStyle = laneColors[i]; ctx.fillRect(0, i * laneH, w, laneH); }
+          // lane markings
+          ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1;
+          for (let i = 1; i < 5; i++) { ctx.beginPath(); ctx.moveTo(0, i * laneH); ctx.lineTo(w, i * laneH); ctx.stroke(); }
+          // cars
+          const carY = [laneH * 1.3, laneH * 2.3];
+          const carColors = ['#ef4444', '#facc15'];
+          for (let l = 0; l < 2; l++) {
+            const cx = ((t * 60 * (l ? -1 : 1) + l * 90)) % w;
+            ctx.fillStyle = carColors[l];
+            ctx.fillRect(((cx % w + w) % w) - 30, carY[l], 50, laneH * 0.45);
+          }
+          // logs (river)
+          for (let l = 0; l < 2; l++) {
+            const lx = ((t * 40 + l * 100)) % w;
+            ctx.fillStyle = '#7c3f00';
+            ctx.fillRect(((lx % w + w) % w) - 50, laneH * 3.3 + l * laneH * 0.05, 70, laneH * 0.4);
+          }
+          // frog
+          const fy = laneH * 0.5 - 8;
+          ctx.fillStyle = '#4ade80';
+          ctx.fillRect(w / 2 - 8, fy, 16, 16);
+          ctx.fillStyle = '#16a34a';
+          ctx.fillRect(w / 2 - 12, fy + 4, 6, 8); ctx.fillRect(w / 2 + 6, fy + 4, 6, 8);
+        }
+      },
+      {
+        id: 'flappy',
+        name: 'Flappy Bird',
+        difficulty: 'easy',
+        color: '#facc15',
+        playUrl: 'https://flappybird.io',
+        desc: 'Tap to keep a bird flying through pipes. Deceptively simple — gravity, obstacles, and one-button gameplay.',
+        tags: ['Gravity', 'Procedural', 'One-Button'],
+        draw(ctx, w, h, t) {
+          // sky
+          const grad = ctx.createLinearGradient(0, 0, 0, h);
+          grad.addColorStop(0, '#1e3a5f'); grad.addColorStop(1, '#0f2040');
+          ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+          // clouds
+          ctx.fillStyle = 'rgba(255,255,255,0.07)';
+          for (let i = 0; i < 3; i++) {
+            const cx = ((t * 25 + i * 120) % w + w) % w;
+            ctx.beginPath(); ctx.arc(cx, 30 + i * 8, 18, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(cx + 16, 28 + i * 8, 12, 0, Math.PI * 2); ctx.fill();
+          }
+          // pipes
+          const pipeX = ((w - t * 70) % w + w) % w;
+          const gapY = h / 2 + Math.sin(t * 0.7) * 30, gapH = 80;
+          ctx.fillStyle = '#16a34a';
+          ctx.fillRect(pipeX - 15, 0, 30, gapY - gapH / 2);
+          ctx.fillRect(pipeX - 15, gapY + gapH / 2, 30, h - gapY - gapH / 2);
+          ctx.fillStyle = '#15803d';
+          ctx.fillRect(pipeX - 18, gapY - gapH / 2 - 12, 36, 12);
+          ctx.fillRect(pipeX - 18, gapY + gapH / 2, 36, 12);
+          // bird
+          const birdY = h / 2 + Math.sin(t * 3) * 20;
+          ctx.fillStyle = '#facc15';
+          ctx.beginPath(); ctx.arc(w * 0.3, birdY, 12, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#fbbf24';
+          ctx.beginPath(); ctx.arc(w * 0.3 + 6, birdY - 3, 6, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(w * 0.3 + 8, birdY - 5, 3, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#1d4ed8'; ctx.beginPath(); ctx.arc(w * 0.3 + 9, birdY - 5, 1.5, 0, Math.PI * 2); ctx.fill();
+        }
+      },
+      {
+        id: 'asteroids',
+        name: 'Asteroids',
+        difficulty: 'hard',
+        color: '#f472b6',
+        playUrl: 'https://www.freeasteroids.org',
+        desc: 'Rotate, thrust, and shoot to destroy space rocks. Teaches rotation math, vector movement, and screen wrapping.',
+        tags: ['Vectors', 'Rotation', 'Screen Wrap'],
+        draw(ctx, w, h, t) {
+          ctx.fillStyle = '#070310';
+          ctx.fillRect(0, 0, w, h);
+          // stars
+          for (let i = 0; i < 60; i++) {
+            ctx.fillStyle = 'white'; ctx.globalAlpha = 0.3 + 0.5 * (Math.sin(t * 0.5 + i) > 0 ? 1 : 0);
+            ctx.fillRect(((i * 197) % w), ((i * 137) % h), 1 + (i % 2), 1 + (i % 2));
+          }
+          ctx.globalAlpha = 1;
+          // asteroids
+          const rocks = [{ x: w * 0.2, y: h * 0.3, r: 28 }, { x: w * 0.7, y: h * 0.6, r: 20 }, { x: w * 0.5, y: h * 0.2, r: 16 }];
+          rocks.forEach((rock, i) => {
+            const rx = rock.x + Math.cos(t * 0.4 + i) * 15;
+            const ry = rock.y + Math.sin(t * 0.3 + i) * 10;
+            const angle = t * 0.5 * (i % 2 ? 1 : -1);
+            ctx.save(); ctx.translate(rx, ry); ctx.rotate(angle);
+            ctx.strokeStyle = '#f472b6'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let p = 0; p < 8; p++) {
+              const a = p / 8 * Math.PI * 2;
+              const jitter = rock.r * (0.7 + 0.3 * Math.sin(p * 3));
+              p === 0 ? ctx.moveTo(Math.cos(a) * jitter, Math.sin(a) * jitter) : ctx.lineTo(Math.cos(a) * jitter, Math.sin(a) * jitter);
+            }
+            ctx.closePath(); ctx.stroke();
+            ctx.restore();
+          });
+          // ship
+          const sx = w / 2, sy = h * 0.7;
+          const sa = t * 0.8;
+          ctx.save(); ctx.translate(sx, sy); ctx.rotate(sa);
+          ctx.strokeStyle = '#e0e0ff'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(0, -16); ctx.lineTo(11, 12); ctx.lineTo(0, 6); ctx.lineTo(-11, 12); ctx.closePath(); ctx.stroke();
+          if (Math.sin(t * 8) > 0) {
+            ctx.strokeStyle = '#f97316';
+            ctx.beginPath(); ctx.moveTo(-5, 8); ctx.lineTo(0, 20); ctx.lineTo(5, 8); ctx.stroke();
+          }
+          ctx.restore();
+        }
+      },
+      {
+        id: 'pacman',
+        name: 'Pac-Man',
+        difficulty: 'hard',
+        color: '#fbbf24',
+        playUrl: 'https://freepacman.org',
+        desc: 'Navigate a maze, eat pellets, and dodge ghosts. The most complex pick — great for pathfinding and AI discussions.',
+        tags: ['Mazes', 'Pathfinding', 'AI Ghosts'],
+        draw(ctx, w, h, t) {
+          ctx.fillStyle = '#000';
+          ctx.fillRect(0, 0, w, h);
+          // simplified maze walls
+          ctx.fillStyle = '#1e40af';
+          const walls = [[0, 0, w, 12], [0, h - 12, w, 12], [0, 0, 12, h], [w - 12, 0, 12, h],
+          [30, 30, 60, 12], [w - 90, 30, 60, 12], [30, h - 42, 60, 12], [w - 90, h - 42, 60, 12],
+          [w / 2 - 20, 25, 40, 40], [w / 2 - 20, h - 65, 40, 40]];
+          walls.forEach(([x, y, ww, wh]) => ctx.fillRect(x, y, ww, wh));
+          // pellets
+          ctx.fillStyle = '#fbbf24';
+          for (let i = 0; i < 12; i++) {
+            const px = 25 + (i % 6) * (w / 6), py = h / 2 + Math.floor(i / 6) * 20 - 10;
+            ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI * 2); ctx.fill();
+          }
+          // ghosts
+          const ghostColors = ['#ef4444', '#f97316', '#ec4899', '#06b6d4'];
+          for (let g = 0; g < 4; g++) {
+            const gx = w * 0.2 + g * (w * 0.18) + Math.sin(t + g) * 15;
+            const gy = h * 0.45 + Math.cos(t * 0.7 + g) * 15;
+            ctx.fillStyle = ghostColors[g];
+            ctx.beginPath(); ctx.arc(gx, gy, 12, Math.PI, 0); ctx.lineTo(gx + 12, gy + 14);
+            for (let b = 0; b < 3; b++) ctx.arc(gx + 12 - (b + 0.5) * 8, gy + 14, 4, 0, Math.PI, true);
+            ctx.lineTo(gx - 12, gy); ctx.fill();
+            ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(gx - 5, gy - 2, 4, 0, Math.PI * 2); ctx.arc(gx + 5, gy - 2, 4, 0, Math.PI * 2); ctx.fill();
+          }
+          // pacman
+          const px = w / 2 + Math.cos(t * 1.5) * 30, py = h * 0.7;
+          const mouth = 0.3 * Math.abs(Math.sin(t * 6));
+          ctx.fillStyle = '#facc15';
+          ctx.beginPath(); ctx.moveTo(px, py); ctx.arc(px, py, 14, mouth, Math.PI * 2 - mouth); ctx.closePath(); ctx.fill();
+        }
+      }
+    ];
+
+    // ---- CANVAS ANIMATION ----
+    const animFrames = {};
+
+    function initGameCards() {
+      const grid = document.getElementById('gamesGrid');
+      GAMES.forEach(game => {
+        const card = document.createElement('div');
+        card.className = 'game-card';
+        card.setAttribute('role', 'listitem');
+        card.dataset.id = game.id;
+        card.style.setProperty('--game-color', game.color);
+        card.innerHTML = `
+      <div class="game-canvas-wrap">
+        <canvas class="game-preview" id="canvas-${game.id}" width="320" height="180" aria-label="${game.name} preview animation"></canvas>
+        <div class="game-selected-badge" aria-hidden="true">✓</div>
+        <div class="game-votes-bar"><div class="game-votes-fill" id="fill-${game.id}" style="background:${game.color}"></div></div>
+      </div>
+      <div class="game-info">
+        <div class="game-top">
+          <div class="game-name">${game.name}</div>
+          <span class="game-diff diff-${game.difficulty}">${game.difficulty}</span>
+        </div>
+        <p class="game-desc">${game.desc}</p>
+        <div class="game-tags">${game.tags.map(tag => `<span class="game-tag">${tag}</span>`).join('')}</div>
+        <div class="game-actions">
+          <a href="${game.playUrl}" target="_blank" rel="noopener" class="game-play-link" onclick="event.stopPropagation()" style="color:${game.color}">▶ Play Online</a>
+          <button class="game-vote-btn" aria-label="Select ${game.name}" onclick="selectGame('${game.id}')">Select This Game</button>
+        </div>
+      </div>
+    `;
+        card.addEventListener('click', (e) => {
+          if (!e.target.closest('button') && !e.target.closest('a')) selectGame(game.id);
+        });
+        card.style.borderColor = 'rgba(255,255,255,0.08)';
+        grid.appendChild(card);
+
+        // Start canvas animation
+        const canvas = document.getElementById(`canvas-${game.id}`);
+        const ctx = canvas.getContext('2d');
+        let frame = 0;
+        function animate() {
+          game.draw(ctx, canvas.width, canvas.height, frame * 0.016);
+          frame++;
+          animFrames[game.id] = requestAnimationFrame(animate);
+        }
+        animate();
+      });
+    }
+
+    // ---- VOTING ----
+    let votes = {};
+    let selectedGame = null;
+
+    function selectGame(id) {
+      selectedGame = id;
+      document.querySelectorAll('.game-card').forEach(card => {
+        const isSelected = card.dataset.id === id;
+        card.classList.toggle('selected', isSelected);
+        const game = GAMES.find(g => g.id === card.dataset.id);
+        card.style.borderColor = isSelected ? game.color : 'rgba(255,255,255,0.08)';
+        card.style.boxShadow = isSelected ? `0 0 0 1px ${game.color}40, 0 4px 24px ${game.color}20` : '';
+        const btn = card.querySelector('.game-vote-btn');
+        if (isSelected) { btn.textContent = '✓ Selected!'; btn.style.background = game.color; }
+        else { btn.textContent = 'Select This Game'; btn.style.background = ''; }
+      });
+
+      const game = GAMES.find(g => g.id === id);
+      const pulse = document.getElementById('votePulse');
+      pulse.style.background = game.color;
+      document.getElementById('voteStatus').innerHTML = `
+    <div class="vote-pulse" id="votePulse" style="background:${game.color}"></div>
+    <div>Class pick: <span class="chosen-name" style="color:${game.color}">${game.name}</span> — let's build it! 🎉</div>
+  `;
+    }
+
+    // ---- WEEK TABS ----
+    function showWeek(index) {
+      document.querySelectorAll('.week-tab').forEach((tab, i) => {
+        const active = i === index;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-selected', active);
+      });
+      document.querySelectorAll('.week-panel').forEach((panel, i) => {
+        panel.classList.toggle('active', i === index);
+      });
+    }
+
+    // ---- INIT ----
+    initGameCards();
+  </script>
+</body>
+
+</html>
