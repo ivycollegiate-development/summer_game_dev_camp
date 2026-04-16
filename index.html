@@ -29,26 +29,27 @@
       --font-display: 'Space Grotesk', sans-serif;
       --font-mono: 'Space Mono', monospace;
 
-      --clr-bg: #0d0d14;
-      --clr-surface: #13131f;
-      --clr-surface-2: #1a1a2a;
-      --clr-border: rgba(255, 255, 255, 0.08);
-      --clr-text: #e8e8f0;
-      --clr-muted: #888899;
-      --clr-faint: #44445a;
+      --clr-bg: #0B1A3B;
+      --clr-surface: #122451;
+      --clr-surface-2: #1B3468;
+      --clr-border: rgba(201, 160, 40, 0.18);
+      --clr-text: #EFF3FB;
+      --clr-muted: #A0AECB;
+      --clr-faint: #2A4A8C;
 
       /* Game color palette */
-      --clr-snake: #22c55e;
-      --clr-space: #a78bfa;
-      --clr-pong: #38bdf8;
-      --clr-breakout: #fb923c;
-      --clr-frogger: #4ade80;
-      --clr-flappy: #facc15;
-      --clr-asteroids: #f472b6;
-      --clr-pacman: #fbbf24;
+      --clr-snake: #4A7DB5;
+      --clr-space: #7AABD4;
+      --clr-pong: #5BA8C4;
+      --clr-breakout: #C9A028;
+      --clr-frogger: #5BA87A;
+      --clr-flappy: #E8C44A;
+      --clr-asteroids: #4A7DB5;
+      --clr-pacman: #D4AF37;
+      --clr-mystery: #C9A028;
 
-      --clr-accent: #7c6ffc;
-      --clr-accent-glow: rgba(124, 111, 252, 0.35);
+      --clr-accent: #C9A028;
+      --clr-accent-glow: rgba(201, 160, 40, 0.35);
 
       --radius-sm: 6px;
       --radius-md: 12px;
@@ -72,15 +73,15 @@
     }
 
     [data-theme="light"] {
-      --clr-bg: #f4f4f7;
+      --clr-bg: #F4F6FA;
       --clr-surface: #ffffff;
-      --clr-surface-2: #e9e9f0;
-      --clr-border: rgba(0, 0, 0, 0.1);
-      --clr-text: #1a1a2e;
-      --clr-muted: #55556a;
-      --clr-faint: #999aad;
-      --clr-accent: #6354e8;
-      --clr-accent-glow: rgba(99, 84, 232, 0.25);
+      --clr-surface-2: #EDF0F7;
+      --clr-border: rgba(27, 52, 104, 0.12);
+      --clr-text: #1A2340;
+      --clr-muted: #5A6580;
+      --clr-faint: #A0B4CC;
+      --clr-accent: #1B3468;
+      --clr-accent-glow: rgba(27, 52, 104, 0.25);
     }
 
     /* Theme toggle */
@@ -275,9 +276,9 @@
       display: inline-flex;
       align-items: center;
       gap: var(--sp-2);
-      background: rgba(124, 111, 252, 0.12);
-      border: 1px solid rgba(124, 111, 252, 0.35);
-      color: #a78bfa;
+      background: rgba(74, 125, 181, 0.12);
+      border: 1px solid rgba(74, 125, 181, 0.35);
+      color: #7AABD4;
       font-size: 13px;
       font-weight: 600;
       letter-spacing: 0.04em;
@@ -296,7 +297,7 @@
     }
 
     .hero h1 .accent {
-      background: linear-gradient(135deg, #7c6ffc 0%, #a78bfa 40%, #38bdf8 100%);
+      background: linear-gradient(135deg, #1B3468 0%, #4A7DB5 40%, #7AABD4 100%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -337,7 +338,7 @@
     }
 
     .btn-primary:hover {
-      background: #6b5fe8;
+      background: #122451;
       box-shadow: 0 0 28px var(--clr-accent-glow);
       transform: translateY(-1px);
     }
@@ -896,9 +897,9 @@
     }
 
     .outcome-chip {
-      background: rgba(124, 111, 252, 0.12);
-      border: 1px solid rgba(124, 111, 252, 0.25);
-      color: #a78bfa;
+      background: rgba(74, 125, 181, 0.12);
+      border: 1px solid rgba(74, 125, 181, 0.25);
+      color: #7AABD4;
       font-size: 13px;
       font-weight: 600;
       padding: 4px 12px;
@@ -1075,10 +1076,10 @@
     <div class="nav-logo">
       <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"
         aria-label="Game Dev Camp logo">
-        <rect x="3" y="3" width="22" height="22" rx="5" fill="#7c6ffc" opacity="0.15" stroke="#7c6ffc"
+        <rect x="3" y="3" width="22" height="22" rx="5" fill="#1B3468" opacity="0.25" stroke="#4A7DB5"
           stroke-width="1.5" />
-        <rect x="8" y="11" width="4" height="6" rx="1" fill="#7c6ffc" />
-        <rect x="16" y="11" width="4" height="6" rx="1" fill="#7c6ffc" />
+        <rect x="8" y="11" width="4" height="6" rx="1" fill="#4A7DB5" />
+        <rect x="16" y="11" width="4" height="6" rx="1" fill="#4A7DB5" />
         <rect x="10" y="13" width="2" height="2" rx="0.5" fill="white" />
         <rect x="18" y="13" width="2" height="2" rx="0.5" fill="white" />
       </svg>
@@ -1137,7 +1138,7 @@
         <div class="stat-label">Weeks of Building</div>
       </div>
       <div class="stat-item" role="listitem">
-        <div class="stat-num">8</div>
+        <div class="stat-num">9</div>
         <div class="stat-label">Game Choices</div>
       </div>
       <div class="stat-item" role="listitem">
@@ -1197,7 +1198,7 @@
     <div class="container">
       <div class="gallery-intro">
         <div class="section-tag">Choose Your Game</div>
-        <h2 class="section-title" id="games-heading">8 Games Students Can Vote For</h2>
+        <h2 class="section-title" id="games-heading">9 Games Students Can Vote For</h2>
         <p class="section-sub">Each game is designed to be completable in 4 weeks while teaching core programming
           skills. Click to select a favorite!</p>
 
@@ -1552,7 +1553,8 @@
     <div class="container">
       <div class="section-tag">Tech Stack</div>
       <h2 class="section-title" id="tools-heading">Tools Students Use</h2>
-      <p class="section-sub">The same tools used by real web developers — inside a beginner-friendly, browser-based workflow.
+      <p class="section-sub">The same tools used by real web developers — inside a beginner-friendly, browser-based
+        workflow.
       </p>
 
       <div class="tools-grid" role="list">
@@ -1747,7 +1749,7 @@
         id: 'space',
         name: 'Space Invaders',
         difficulty: 'medium',
-        color: '#a78bfa',
+        color: '#7AABD4',
         playUrl: 'https://freeinvaders.org',
         desc: 'Defend Earth from waves of alien invaders. Shoot them before they reach the bottom. A classic for a reason.',
         tags: ['Shooting', '2D Arrays', 'Waves'],
@@ -1766,7 +1768,7 @@
           const cols = 5, rows = 3, iw = 18, ih = 14, gap = 8;
           const ox = (w - (cols * (iw + gap))) / 2 + Math.sin(t * 0.5) * 20;
           const oy = 20 + Math.sin(t * 0.3) * 5;
-          const colors = ['#a78bfa', '#818cf8', '#c4b5fd'];
+          const colors = ['#4A7DB5', '#5BA8C4', '#7AABD4'];
           for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
             ctx.fillStyle = colors[r];
             const ix = ox + c * (iw + gap), iy = oy + r * (ih + gap + 4);
@@ -1926,7 +1928,7 @@
         id: 'asteroids',
         name: 'Asteroids',
         difficulty: 'hard',
-        color: '#f472b6',
+        color: '#4A7DB5',
         playUrl: 'https://www.freeasteroids.org',
         desc: 'Rotate, thrust, and shoot to destroy space rocks. Teaches rotation math, vector movement, and screen wrapping.',
         tags: ['Vectors', 'Rotation', 'Screen Wrap'],
@@ -1946,7 +1948,7 @@
             const ry = rock.y + Math.sin(t * 0.3 + i) * 10;
             const angle = t * 0.5 * (i % 2 ? 1 : -1);
             ctx.save(); ctx.translate(rx, ry); ctx.rotate(angle);
-            ctx.strokeStyle = '#f472b6'; ctx.lineWidth = 2;
+            ctx.strokeStyle = '#4A7DB5'; ctx.lineWidth = 2;
             ctx.beginPath();
             for (let p = 0; p < 8; p++) {
               const a = p / 8 * Math.PI * 2;
@@ -1960,7 +1962,7 @@
           const sx = w / 2, sy = h * 0.7;
           const sa = t * 0.8;
           ctx.save(); ctx.translate(sx, sy); ctx.rotate(sa);
-          ctx.strokeStyle = '#e0e0ff'; ctx.lineWidth = 2;
+          ctx.strokeStyle = '#EFF3FB'; ctx.lineWidth = 2;
           ctx.beginPath(); ctx.moveTo(0, -16); ctx.lineTo(11, 12); ctx.lineTo(0, 6); ctx.lineTo(-11, 12); ctx.closePath(); ctx.stroke();
           if (Math.sin(t * 8) > 0) {
             ctx.strokeStyle = '#f97316';
@@ -2008,6 +2010,70 @@
           const mouth = 0.3 * Math.abs(Math.sin(t * 6));
           ctx.fillStyle = '#facc15';
           ctx.beginPath(); ctx.moveTo(px, py); ctx.arc(px, py, 14, mouth, Math.PI * 2 - mouth); ctx.closePath(); ctx.fill();
+        }
+      },
+      {
+        id: 'mystery',
+        name: 'Mystery Game ★',
+        difficulty: 'surprise',
+        color: '#C9A028',
+        playUrl: '#',
+        desc: 'The instructor reveals a surprise game on Day 1 — you get to vote on it after a live preview. Any genre, any mechanic. Could be anything.',
+        tags: ['Instructor Pick', 'Class Vote', 'Surprise'],
+        draw(ctx, w, h, t) {
+          // Background – deep navy
+          ctx.fillStyle = '#080E1F';
+          ctx.fillRect(0, 0, w, h);
+          // Floating small question marks
+          const positions = [
+            { x: w * 0.12, y: h * 0.25, sz: 18, phase: 0.0 },
+            { x: w * 0.82, y: h * 0.20, sz: 14, phase: 1.1 },
+            { x: w * 0.22, y: h * 0.72, sz: 22, phase: 2.3 },
+            { x: w * 0.78, y: h * 0.75, sz: 16, phase: 0.7 },
+            { x: w * 0.55, y: h * 0.15, sz: 12, phase: 1.8 },
+            { x: w * 0.07, y: h * 0.50, sz: 10, phase: 3.1 },
+            { x: w * 0.90, y: h * 0.50, sz: 11, phase: 2.0 },
+          ];
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          positions.forEach(p => {
+            const yOff = Math.sin(t * 0.9 + p.phase) * 6;
+            ctx.globalAlpha = 0.18 + 0.12 * Math.sin(t * 1.1 + p.phase);
+            ctx.fillStyle = '#C9A028';
+            ctx.font = `bold ${p.sz}px 'Space Mono', monospace`;
+            ctx.fillText('?', p.x, p.y + yOff);
+          });
+          // Centre glowing ? mark
+          const pulse = 0.85 + 0.15 * Math.sin(t * 2.2);
+          const glowR = 32 + 8 * Math.sin(t * 1.8);
+          // Outer glow rings
+          for (let g = 3; g >= 1; g--) {
+            const gAlpha = 0.06 * g * pulse;
+            const gSize = glowR * (1 + g * 0.45);
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, gSize);
+            grad.addColorStop(0, `rgba(201,160,40,${gAlpha})`);
+            grad.addColorStop(1, 'rgba(201,160,40,0)');
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(w / 2, h / 2, gSize, 0, Math.PI * 2); ctx.fill();
+          }
+          // Centre ? text
+          ctx.globalAlpha = pulse;
+          ctx.fillStyle = '#E8C44A';
+          ctx.font = `bold 68px 'Space Mono', monospace`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('?', w / 2, h / 2 + 4);
+          // Orbiting dots
+          for (let d = 0; d < 6; d++) {
+            const angle = t * 0.8 + d * (Math.PI * 2 / 6);
+            const ox = w / 2 + Math.cos(angle) * 44;
+            const oy = h / 2 + Math.sin(angle) * 44;
+            ctx.globalAlpha = 0.55 + 0.45 * Math.sin(t * 2 + d);
+            ctx.fillStyle = '#C9A028';
+            ctx.beginPath(); ctx.arc(ox, oy, 3, 0, Math.PI * 2); ctx.fill();
+          }
+          ctx.globalAlpha = 1;
         }
       }
     ];
